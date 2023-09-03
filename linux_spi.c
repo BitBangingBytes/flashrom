@@ -168,7 +168,7 @@ static int linux_spi_init(const struct programmer_cfg *cfg)
 	uint32_t speed_hz = 2 * 1000 * 1000;
 	/* FIXME: make the following configurable by CLI options. */
 	/* SPI mode 0 (beware this also includes: MSB first, CS active low and others */
-	const uint8_t mode = SPI_MODE_0;
+	uint8_t mode = SPI_MODE_0;
 	const uint8_t bits = 8;
 	int fd;
 	size_t max_kernel_buf_size;
@@ -186,6 +186,40 @@ static int linux_spi_init(const struct programmer_cfg *cfg)
 		msg_pinfo("Using default %"PRIu32
 			  "kHz clock. Use 'spispeed' parameter to override.\n",
 			  speed_hz / 1000);
+	}
+	free(param_str);
+
+	param_str = extract_programmer_param_str(cfg, "spimode");
+	if (param_str && strlen(param_str)) {
+		mode = (uint8_t)strtoul(param_str, &endp, 10);
+		if (param_str == endp || mode > 3) {
+			msg_perr("%s: invalid mode: %s\n", __func__, param_str);
+			free(param_str);
+			return 1;
+		} else {
+			switch (mode)
+			{
+			case 0:
+				mode = SPI_MODE_0;
+				break;
+			case 1:
+				mode = SPI_MODE_1;
+				break;
+			case 2:
+				mode = SPI_MODE_2;
+				break;
+			case 3:
+				mode = SPI_MODE_3;
+				break;
+			default:
+				mode = SPI_MODE_0;
+				break;
+			}
+		}
+	} else {
+		msg_pinfo("Using default SPI_MODE_%"PRIu8
+			  ". Use 'spimode' parameter to override.\n",
+			  mode);
 	}
 	free(param_str);
 
