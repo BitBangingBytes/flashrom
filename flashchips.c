@@ -2942,7 +2942,7 @@ const struct flashchip flashchips[] = {
 		/* OTP: 128B total, 64B pre-programmed; read 0x77; write 0x9B */
 		.feature_bits	= FEATURE_OTP,
 		.tested		= TEST_UNTESTED,
-		.probe		= NO_PROBE_FUNC,
+		.probe		= PROBE_OPAQUE,
 		.probe_timing	= TIMING_ZERO,
 		.block_erasers	=
 		{
