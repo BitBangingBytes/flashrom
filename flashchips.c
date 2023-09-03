@@ -2932,6 +2932,48 @@ const struct flashchip flashchips[] = {
 
 	{
 		.vendor		= "Atmel",
+		.name		= "AT45DB081B",
+		.bustype	= BUS_SPI,
+		.manufacture_id	= 0,
+		.model_id	= 0,
+		.total_size	= 1024, /* or 1056, determined from status register */
+		.page_size	= 256, /* or 264, determined from status register */
+		/* does not support EWSR nor WREN and has no writable status register bits whatsoever */
+		/* OTP: 128B total, 64B pre-programmed; read 0x77; write 0x9B */
+		.feature_bits	= FEATURE_OTP,
+		.tested		= TEST_UNTESTED,
+		.probe		= NO_PROBE_FUNC,
+		.probe_timing	= TIMING_ZERO,
+		.block_erasers	=
+		{
+			{
+				.eraseblocks = { {256, 4096} },
+				.block_erase = SPI_ERASE_AT45DB_PAGE,
+			}, {
+				.eraseblocks = { {8 * 256, 4096/8} },
+				.block_erase = SPI_ERASE_AT45DB_BLOCK,
+			}, {
+				.eraseblocks = {
+					{8 * 256, 1},
+					{248 * 256, 1},
+					{256 * 256, 15},
+				},
+				.block_erase = SPI_ERASE_AT45DB_SECTOR
+			}, {
+				.eraseblocks = { {1024 * 1024, 1} },
+				.block_erase = SPI_ERASE_AT45DB_CHIP,
+			}
+		},
+		.printlock	= SPI_PRETTYPRINT_STATUS_REGISTER_AT45DB,
+		.unlock		= SPI_DISABLE_BLOCKPROTECT_AT45DB, /* Impossible if locked down or #WP is low */
+		/* granularity will be set by the probing function. */
+		.write		= SPI_CHIP_WRITE256,
+		.read		= SPI_CHIP_READ, /* Fast read (0x0B) supported */
+		.voltage	= {2700, 3600}, /* 2.5-3.6V & 2.7-3.6V models available */
+	},
+
+	{
+		.vendor		= "Atmel",
 		.name		= "AT45DB081D",
 		.bustype	= BUS_SPI,
 		.manufacture_id	= ATMEL_ID,
